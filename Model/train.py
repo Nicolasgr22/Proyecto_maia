@@ -7,7 +7,7 @@ import mlflow
 import mlflow.sklearn
 
 # Cargar datos
-data = pd.read_csv("../data/housing.csv")
+data = pd.read_csv("Data/Data_Seattle.csv")
 
 # Definir columnas relevantes (excluyendo id, date, price)
 features = [
@@ -44,7 +44,7 @@ with mlflow.start_run():
 
     # Guardar parámetros y métricas en config.json
     config = {
-        "features": features,  # lista de columnas esperadas
+        "features": features,  
         "best_params": grid.best_params_,
         "best_score": grid.best_score_
     }
