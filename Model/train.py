@@ -8,7 +8,15 @@ import mlflow.sklearn
 
 # Cargar datos
 data = pd.read_csv("../data/housing.csv")
-X = data.drop("price", axis=1)
+
+# Definir columnas relevantes (excluyendo id, date, price)
+features = [
+    "bedrooms","bathrooms","sqft_living","sqft_lot","floors",
+    "waterfront","view","condition","grade","sqft_above","sqft_basement",
+    "yr_built","yr_renovated","zipcode","lat","long","sqft_living15","sqft_lot15"
+]
+
+X = data[features]
 y = data["price"]
 
 # Dividir datos
@@ -36,6 +44,7 @@ with mlflow.start_run():
 
     # Guardar parámetros y métricas en config.json
     config = {
+        "features": features,  # lista de columnas esperadas
         "best_params": grid.best_params_,
         "best_score": grid.best_score_
     }
@@ -48,3 +57,4 @@ with mlflow.start_run():
     mlflow.sklearn.log_model(best_model, "model")
 
 print("Modelo entrenado, guardado en model/xgb_model.pkl y registrado en MLflow")
+

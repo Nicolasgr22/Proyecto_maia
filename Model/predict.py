@@ -4,13 +4,28 @@ import pandas as pd
 # Cargar modelo
 model = joblib.load("xgb_model.pkl")
 
-# Ejemplo de entrada (puede ser un CSV o dict)
+# Ejemplo de entrada 
 X_new = pd.DataFrame([{
-    "rooms": 3,
-    "bathrooms": 2,
-    "area": 120,
-    "location_score": 8
+    "bedrooms": 3,
+    "bathrooms": 1,
+    "sqft_living": 1180,
+    "sqft_lot": 5650,
+    "floors": 1,
+    "waterfront": 0,
+    "view": 0,
+    "condition": 3,
+    "grade": 7,
+    "sqft_above": 1180,
+    "sqft_basement": 0,
+    "yr_built": 1955,
+    "yr_renovated": 0,
+    "zipcode": 98178,
+    "lat": 47.5112,
+    "long": -122.257,
+    "sqft_living15": 1340,
+    "sqft_lot15": 5650
 }])
+
 
 # Predicción
 prediction = model.predict(X_new)
