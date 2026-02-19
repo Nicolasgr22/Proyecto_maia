@@ -6,8 +6,8 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 import os
 
-# 1. Crear carpeta 'models/saved' si no existe
-os.makedirs("models/saved", exist_ok=True)
+# 1. Crear carpeta de resultados si no existe
+os.makedirs("models_test/saved", exist_ok=True)
 
 # 2. Cargar datos
 df = pd.read_csv("Data/Data_Seattle.csv")
@@ -19,7 +19,7 @@ df["month"] = df["date"].dt.month
 df["day"] = df["date"].dt.day
 df = df.drop("date", axis=1)
 
-# 4. Separar variables (X) y target (y)
+# 4. Separar variables 
 X = df.drop("price", axis=1)
 y = df["price"]
 
@@ -31,7 +31,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 # 6. Definir modelo base
 rf = RandomForestRegressor(random_state=42, n_jobs=-1)
 
-# 7. Definir hiperparámetros a probar
+# 7. Definir hiperparámetros 
 param_grid = {
     "n_estimators": [100, 200],
     "max_depth": [None, 10, 20],
@@ -61,10 +61,10 @@ r2_best = r2_score(y_test, y_pred_best)
 print("Mejores parámetros:", grid_search.best_params_)
 print("Random Forest optimizado -> RMSE:", rmse_best, "R²:", r2_best)
 
-# 10. Guardar modelo en carpeta 'models/saved'
-joblib.dump(best_rf, "models/saved/random_forest_gridsearch.pkl")
+# 10. Guardar modelo 
+joblib.dump(best_rf, "models_test/saved/random_forest_gridsearch.pkl")
 
-# 11. Guardar parámetros y métricas en JSON
+# 11. Guardar parámetros y métricas 
 results = {
     "model": "RandomForest_GridSearch",
     "params": grid_search.best_params_,
@@ -74,5 +74,5 @@ results = {
     }
 }
 
-with open("models/saved/random_forest_gridsearch_results.json", "w") as f:
+with open("models_test/saved/random_forest_gridsearch_results.json", "w") as f:
     json.dump(results, f, indent=4)

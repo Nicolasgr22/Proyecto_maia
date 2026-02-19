@@ -6,8 +6,8 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 
-# 1. Crear carpeta 'models/saved' si no existe
-os.makedirs("models/saved", exist_ok=True)
+# 1. Crear carpeta de resultados si no existe
+os.makedirs("models_test/saved", exist_ok=True)
 
 # 2. Cargar datos
 df = pd.read_csv("Data/Data_Seattle.csv")
@@ -19,7 +19,7 @@ df["month"] = df["date"].dt.month
 df["day"] = df["date"].dt.day
 df = df.drop("date", axis=1)
 
-# 4. Separar variables (X) y target (y)
+# 4. Separar variables 
 X = df.drop("price", axis=1)
 y = df["price"]
 
@@ -31,7 +31,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 # 6. Definir modelo base
 gb = GradientBoostingRegressor(random_state=42)
 
-# 7. Definir hiperparámetros a probar
+# 7. Definir hiperparámetros 
 param_grid = {
     "n_estimators": [100, 200, 300],
     "learning_rate": [0.05, 0.1, 0.2],
@@ -63,9 +63,9 @@ print("Mejores parámetros:", grid_search.best_params_)
 print("Gradient Boosting optimizado -> RMSE:", rmse_best, "R²:", r2_best)
 
 # 10. Guardar modelo
-joblib.dump(best_gb, "models/saved/gradient_boosting_gridsearch.pkl")
+joblib.dump(best_gb, "models_test/saved/gradient_boosting_gridsearch.pkl")
 
-# 11. Guardar parámetros y métricas en JSON
+# 11. Guardar parámetros y métricas 
 results = {
     "model": "GradientBoosting_GridSearch",
     "params": grid_search.best_params_,
@@ -75,5 +75,5 @@ results = {
     }
 }
 
-with open("models/saved/gradient_boosting_gridsearch_results.json", "w") as f:
+with open("models_test/saved/gradient_boosting_gridsearch_results.json", "w") as f:
     json.dump(results, f, indent=4)

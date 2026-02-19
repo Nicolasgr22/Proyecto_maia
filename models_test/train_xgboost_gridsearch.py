@@ -6,8 +6,8 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import mean_squared_error, r2_score
 from xgboost import XGBRegressor
 
-# 1. Crear carpeta 'models/saved' si no existe
-os.makedirs("models/saved", exist_ok=True)
+# 1. Crear carpeta de resultados si no existe
+os.makedirs("models_test/saved", exist_ok=True)
 
 # 2. Cargar datos
 df = pd.read_csv("Data/Data_Seattle.csv")
@@ -19,7 +19,7 @@ df["month"] = df["date"].dt.month
 df["day"] = df["date"].dt.day
 df = df.drop("date", axis=1)
 
-# 4. Separar variables (X) y target (y)
+# 4. Separar variables 
 X = df.drop("price", axis=1)
 y = df["price"]
 
@@ -31,7 +31,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 # 6. Definir modelo base
 xgb = XGBRegressor(random_state=42, n_jobs=-1)
 
-# 7. Definir hiperparámetros a probar
+# 7. Definir hiperparámetros 
 param_grid = {
     "n_estimators": [300, 500],
     "learning_rate": [0.05, 0.1],
@@ -63,9 +63,9 @@ print("Mejores parámetros:", grid_search.best_params_)
 print("XGBoost optimizado -> RMSE:", rmse_best, "R²:", r2_best)
 
 # 10. Guardar modelo
-joblib.dump(best_xgb, "models/saved/xgboost_gridsearch.pkl")
+joblib.dump(best_xgb, "models_test/saved/xgboost_gridsearch.pkl")
 
-# 11. Guardar parámetros y métricas en JSON
+# 11. Guardar parámetros y métricas 
 results = {
     "model": "XGBoost_GridSearch",
     "params": grid_search.best_params_,
@@ -75,5 +75,5 @@ results = {
     }
 }
 
-with open("models/saved/xgboost_gridsearch_results.json", "w") as f:
+with open("models_test/saved/xgboost_gridsearch_results.json", "w") as f:
     json.dump(results, f, indent=4)
