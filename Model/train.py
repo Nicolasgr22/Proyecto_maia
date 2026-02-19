@@ -7,7 +7,7 @@ import mlflow
 import mlflow.sklearn
 
 # Cargar datos
-data = pd.read_csv("Data/Data_Seattle.csv")
+data = pd.read_csv("../Data/Data_Seattle.csv")
 
 # Definir columnas relevantes (excluyendo id, date, price)
 features = [
