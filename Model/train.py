@@ -1,13 +1,15 @@
 import pandas as pd
 from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from xgboost import XGBRegressor
 import joblib
 import json
 import mlflow
 import mlflow.sklearn
+import numpy as np
 
 # Cargar datos
-data = pd.read_csv("../Data/Data_Seattle.csv")
+data = pd.read_csv("../data/Data_Seattle.csv")
 
 # Definir columnas relevantes (excluyendo id, date, price)
 features = [
@@ -42,11 +44,25 @@ with mlflow.start_run():
     best_model = grid.best_estimator_
     joblib.dump(best_model, "xgb_model.pkl")
 
+    # Evaluar en conjunto de prueba
+    y_pred = best_model.predict(X_test)
+    mse = mean_squared_error(y_test, y_pred)
+    rmse = np.sqrt(mse)
+    mae = mean_absolute_error(y_test, y_pred)
+    r2 = r2_score(y_test, y_pred)
+
+    print("RMSE:", rmse)
+    print("MAE:", mae)
+    print("R²:", r2)
+
     # Guardar parámetros y métricas en config.json
     config = {
-        "features": features,  
+        "features": features,
         "best_params": grid.best_params_,
-        "best_score": grid.best_score_
+        "best_score": grid.best_score_,  # sigue siendo neg MSE de cross-validation
+        "rmse": rmse,
+        "mae": mae,
+        "r2": r2
     }
     with open("config.json", "w") as f:
         json.dump(config, f, indent=4)
@@ -54,6 +70,9 @@ with mlflow.start_run():
     # Log en MLflow
     mlflow.log_params(grid.best_params_)
     mlflow.log_metric("best_score", grid.best_score_)
+    mlflow.log_metric("rmse", rmse)
+    mlflow.log_metric("mae", mae)
+    mlflow.log_metric("r2", r2)
     mlflow.sklearn.log_model(best_model, "model")
 
 print("Modelo entrenado, guardado en model/xgb_model.pkl y registrado en MLflow")
