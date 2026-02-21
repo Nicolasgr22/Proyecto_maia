@@ -39,6 +39,38 @@ En macOS, puedes instalar uv usando Homebrew:
 brew install uv
 ```
 
+---
+
+## Estructura de carpetas
+
+La organización del proyecto es la siguiente:
+
+```text
+Proyecto_maia/
+├── Data/
+│   └── Data_Seattle.csv         # Dataset principal
+├── Model/
+│   ├── config.json              # Configuración del modelo
+│   ├── predict.py               # Script para predicción
+│   ├── requirements.txt         # Dependencias del modelo
+│   ├── train.py                 # Script de entrenamiento
+│   └── xgb_model.pkl            # Modelo XGBoost guardado
+├── models_test/
+│   ├── SVM_regression.ipynb     # Notebook de pruebas SVM
+│   ├── train_gb_gridsearch.py   # Script GridSearch Gradient Boosting
+│   ├── train_rf_gridsearch.py   # Script GridSearch Random Forest
+│   ├── train_xgboost_gridsearch.py # Script GridSearch XGBoost
+│   └── models_test/
+│       └── saved/
+│           ├── svm_gridsearch.pkl         # Modelo SVM guardado
+│           └── svm_gridsearch_results.json # Resultados GridSearch SVM
+├── .gitignore                  # Exclusiones de git
+├── README.md                   # Documentación principal
+└── ...                         # Otros archivos y carpetas
+```
+
+Cada carpeta contiene scripts, datos o resultados relacionados con el entrenamiento, pruebas y despliegue de modelos de regresión para estimación de precios de vivienda.
+
 O directamente con pip:
 
 ```bash
