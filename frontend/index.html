@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1565C0" />
+  <title>MAIA · Valoración Inmobiliaria</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ════════════════════════════════════════
+       NAVEGACIÓN SUPERIOR COMPARTIDA
+       ════════════════════════════════════════ -->
+  <div class="top-nav">
+    <header class="app-bar">
+      <!-- Botón volver (oculto en paso 1) -->
+      <button class="icon-btn" id="nav-back" aria-label="Volver" hidden>
+        <span class="material-symbols-rounded">arrow_back</span>
+      </button>
+      <!-- Spacer izquierdo (visible en paso 1) -->
+      <div class="app-bar__spacer" id="spacer-left"></div>
+
+      <h1 class="app-bar__title" id="nav-title">Datos del Inmueble</h1>
+
+      <!-- Botón compartir (oculto en paso 1) -->
+      <button class="icon-btn" id="nav-share" aria-label="Compartir" hidden onclick="shareResult()">
+        <span class="material-symbols-rounded">share</span>
+      </button>
+      <!-- Spacer derecho (visible en paso 1) -->
+      <div class="app-bar__spacer" id="spacer-right"></div>
+    </header>
+
+    <!-- Indicador de pasos (clickeable) -->
+    <div class="step-progress">
+      <div class="step-dots" role="navigation" aria-label="Pasos del proceso">
+        <button class="step-dot active" data-step="1" onclick="goToStep(1)" aria-label="Paso 1: Datos del inmueble">
+          <span class="step-dot__num">1</span>
+          <span class="step-dot__label">Datos</span>
+        </button>
+        <div class="step-line" data-line="1"></div>
+        <button class="step-dot" data-step="2" onclick="goToStep(2)" aria-label="Paso 2: Tu valoración">
+          <span class="step-dot__num">2</span>
+          <span class="step-dot__label">Valoración</span>
+        </button>
+        <div class="step-line" data-line="2"></div>
+        <button class="step-dot" data-step="3" onclick="goToStep(3)" aria-label="Paso 3: Análisis">
+          <span class="step-dot__num">3</span>
+          <span class="step-dot__label">Análisis</span>
+        </button>
+      </div>
+      <div class="progress-track" role="progressbar" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100" id="main-progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:33%"></div>
+      </div>
+    </div>
+  </div><!-- /top-nav -->
+
+
+  <!-- ════════════════════════════════════════
+       CONTENEDOR DE PANTALLAS
+       ════════════════════════════════════════ -->
+  <div class="screens-container">
+
+    <!-- ──────────────────────────────────────
+         PASO 1 · Datos del Inmueble
+         ────────────────────────────────────── -->
+    <section id="step-1" class="screen active" aria-label="Datos del Inmueble">
+      <div class="screen-scroll">
+
+        <div class="screen-header">
+          <h2 class="display-title">Cuéntanos sobre tu&nbsp;propiedad</h2>
+          <p class="subtitle">Cuantos más detalles proporciones, más precisa será nuestra valoración de mercado.</p>
+        </div>
+
+        <form id="property-form" novalidate>
+
+          <!-- ── Superficies ── -->
+          <div class="form-section">
+            <p class="form-section__title">
+              <span class="material-symbols-rounded form-section__icon">square_foot</span>
+              Superficies
+            </p>
+            <div class="form-grid">
+
+              <!-- sqft_living — full width -->
+              <div class="field-group field--full">
+                <label class="field-label" for="sqft-living">ÁREA CONSTRUIDA HABITABLE</label>
+                <div class="text-field">
+                  <input type="number" id="sqft-living" name="sqft_living"
+                    placeholder="Ej: 140" min="10" max="1400" step="1" inputmode="numeric" />
+                  <span class="field-suffix">m²</span>
+                </div>
+              </div>
+
+              <!-- sqft_lot -->
+              <div class="field-group">
+                <label class="field-label" for="sqft-lot">ÁREA DEL TERRENO</label>
+                <div class="text-field">
+                  <input type="number" id="sqft-lot" name="sqft_lot"
+                    placeholder="Ej: 525" min="50" max="18500" inputmode="numeric" />
+                  <span class="field-suffix">m²</span>
+                </div>
+              </div>
+
+              <!-- sqft_above -->
+              <div class="field-group">
+                <label class="field-label" for="sqft-above">ÁREA SOBRE EL NIVEL DEL SUELO</label>
+                <div class="text-field">
+                  <input type="number" id="sqft-above" name="sqft_above"
+                    placeholder="Ej: 110" min="0" max="1400" inputmode="numeric" />
+                  <span class="field-suffix">m²</span>
+                </div>
+                <span class="field-hint">Superficie sin incluir sótano</span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- ── Habitaciones y Estructura ── -->
+          <div class="form-section">
+            <p class="form-section__title">
+              <span class="material-symbols-rounded form-section__icon">bedroom_parent</span>
+              Habitaciones y Estructura
+            </p>
+            <div class="form-grid">
+
+              <!-- bedrooms -->
+              <div class="field-group">
+                <label class="field-label">HABITACIONES</label>
+                <div class="counter" role="group" aria-label="Número de habitaciones">
+                  <button type="button" class="counter-btn" data-target="bedrooms" data-action="dec" aria-label="Reducir">
+                    <span class="material-symbols-rounded">remove</span>
+                  </button>
+                  <span class="counter-value" id="bedrooms-display">3</span>
+                  <input type="hidden" id="bedrooms" name="bedrooms" value="3" />
+                  <button type="button" class="counter-btn counter-btn--add" data-target="bedrooms" data-action="inc" aria-label="Aumentar">
+                    <span class="material-symbols-rounded">add</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- bathrooms -->
+              <div class="field-group">
+                <label class="field-label">BAÑOS</label>
+                <div class="counter" role="group" aria-label="Número de baños">
+                  <button type="button" class="counter-btn" data-target="bathrooms" data-action="dec" aria-label="Reducir">
+                    <span class="material-symbols-rounded">remove</span>
+                  </button>
+                  <span class="counter-value" id="bathrooms-display">2</span>
+                  <input type="hidden" id="bathrooms" name="bathrooms" value="2" />
+                  <button type="button" class="counter-btn counter-btn--add" data-target="bathrooms" data-action="inc" aria-label="Aumentar">
+                    <span class="material-symbols-rounded">add</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- floors — full width -->
+              <div class="field-group field--full">
+                <label class="field-label">NÚMERO DE PISOS</label>
+                <div class="chip-group" role="radiogroup" aria-label="Número de pisos">
+                  <input type="radio" name="floors" id="fl-1"  value="1"   class="chip-input" checked />
+                  <label class="chip" for="fl-1">1</label>
+                  <input type="radio" name="floors" id="fl-15" value="1.5" class="chip-input" />
+                  <label class="chip" for="fl-15">1.5</label>
+                  <input type="radio" name="floors" id="fl-2"  value="2"   class="chip-input" />
+                  <label class="chip" for="fl-2">2</label>
+                  <input type="radio" name="floors" id="fl-25" value="2.5" class="chip-input" />
+                  <label class="chip" for="fl-25">2.5</label>
+                  <input type="radio" name="floors" id="fl-3"  value="3"   class="chip-input" />
+                  <label class="chip" for="fl-3">3+</label>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- ── Sótano ── -->
+          <div class="form-section">
+            <p class="form-section__title">
+              <span class="material-symbols-rounded form-section__icon">foundation</span>
+              Sótano
+            </p>
+            <div class="field-group">
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <p class="toggle-label">¿TIENE SÓTANO?</p>
+                  <p class="toggle-desc">La propiedad cuenta con área habitable bajo el nivel del suelo</p>
+                </div>
+                <label class="toggle-switch" aria-label="Tiene sótano">
+                  <input type="checkbox" id="has-basement" role="switch" />
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
+              </div>
+              <div id="basement-reveal" class="basement-reveal" hidden>
+                <label class="field-label" for="sqft-basement">ÁREA DEL SÓTANO</label>
+                <div class="text-field">
+                  <input type="number" id="sqft-basement" name="sqft_basement"
+                    placeholder="Ej: 72" min="1" max="465" inputmode="numeric" />
+                  <span class="field-suffix">m²</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Estado y Calidad ── -->
+          <div class="form-section">
+            <p class="form-section__title">
+              <span class="material-symbols-rounded form-section__icon">verified</span>
+              Estado y Calidad
+            </p>
+
+            <!-- condition -->
+            <div class="field-group">
+              <div class="field-label-row">
+                <label class="field-label" for="condition">ESTADO DE CONSERVACIÓN</label>
+                <span class="field-badge" id="condition-label">Buen estado</span>
+              </div>
+              <input type="range" id="condition" name="condition"
+                min="1" max="5" value="3" class="slider" aria-label="Estado de conservación" />
+              <div class="slider-marks">
+                <span>A reformar</span>
+                <span>Reformado</span>
+                <span>A estrenar</span>
+              </div>
+            </div>
+
+            <!-- grade -->
+            <div class="field-group">
+              <div class="field-label-row">
+                <label class="field-label" for="grade">CALIFICACIÓN DE LA CONSTRUCCIÓN</label>
+                <span class="field-badge" id="grade-label">7 / 13</span>
+              </div>
+              <input type="range" id="grade" name="grade"
+                min="1" max="13" value="7" class="slider" aria-label="Calificación de la construcción" />
+              <div class="slider-marks">
+                <span>Básica</span>
+                <span>Estándar</span>
+                <span>Lujo</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ── Antigüedad (opcional) ── -->
+          <div class="form-section">
+            <p class="form-section__title">
+              <span class="material-symbols-rounded form-section__icon">history</span>
+              Antigüedad
+              <span class="optional-tag">opcional</span>
+            </p>
+            <div class="field-group">
+              <div class="field-label-row">
+                <label class="field-label" for="yr-age">¿QUÉ TAN ANTIGUO ES EL INMUEBLE?</label>
+                <span class="field-badge" id="age-label">Nuevo</span>
+              </div>
+              <input type="range" id="yr-age" name="yr_age"
+                min="1900" max="2026" step="5" value="2026"
+                class="slider age-slider"
+                aria-label="Año de construcción del inmueble" />
+              <div class="age-track-labels">
+                <span>~1900</span>
+                <span>Nuevo</span>
+              </div>
+              <p class="field-hint age-hint" id="age-hint">Construido aproximadamente hoy</p>
+              <input type="hidden" id="yr-built" name="yr_built" value="" />
+            </div>
+          </div>
+
+        </form>
+      </div><!-- /screen-scroll -->
+
+      <div class="bottom-bar">
+        <button class="btn-primary btn-full" onclick="submitValuation()">
+          <span>Obtener Valoración</span>
+          <span class="material-symbols-rounded">trending_up</span>
+        </button>
+        <p class="bottom-note">La valoración se basa en datos de mercado actualizados hoy.</p>
+      </div>
+    </section>
+
+
+    <!-- ──────────────────────────────────────
+         PASO 2 · Tu Valoración
+         ────────────────────────────────────── -->
+    <section id="step-2" class="screen" aria-label="Tu Valoración">
+      <div class="screen-scroll">
+
+        <!-- Hero precio -->
+        <div class="valuation-hero">
+          <p class="valuation-hero__eyebrow">ESTIMACIÓN DE MERCADO</p>
+          <p class="valuation-hero__price" id="price-range">—</p>
+          <div class="confidence-row" id="confidence-badge">
+            <span class="material-symbols-rounded confidence-icon">check_circle</span>
+            <span>Confianza del cálculo: <strong id="confidence-text">—</strong></span>
+          </div>
+        </div>
+
+        <!-- Estado del mercado -->
+        <div class="card card--elevated">
+          <div class="card-header">
+            <span class="card-emoji">🔥</span>
+            <h3 class="card-title">Estado del Mercado</h3>
+          </div>
+          <div class="thermometer">
+            <div class="thermometer__track">
+              <div class="thermometer__dot" id="market-dot" style="left:75%"></div>
+            </div>
+            <div class="thermometer__labels">
+              <span>FRÍO</span>
+              <span>EQUILIBRADO</span>
+              <span>CALIENTE</span>
+            </div>
+          </div>
+          <div class="market-message" id="market-message">
+            <p id="market-text">—</p>
+          </div>
+        </div>
+
+        <!-- Comparativa de zona -->
+        <h3 class="section-title">Comparativa de Zona</h3>
+        <div class="stats-row">
+          <div class="stat-card">
+            <span class="stat-icon material-symbols-rounded">location_on</span>
+            <p class="stat-label">Precio medio zona</p>
+            <p class="stat-value" id="zone-avg-price">—</p>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon material-symbols-rounded">trending_up</span>
+            <p class="stat-label">Tendencia anual</p>
+            <p class="stat-value positive" id="annual-trend">—</p>
+          </div>
+        </div>
+
+        <!-- Nota comparativa -->
+        <div class="info-note card">
+          <span class="material-symbols-rounded note-icon">info</span>
+          <p>Esta estimación es un <strong id="vs-zone">—</strong> a la media de la zona.</p>
+        </div>
+
+        <!-- CTA → Paso 3 -->
+        <button class="btn-primary btn-full" id="view-analysis-btn">
+          <span class="material-symbols-rounded">analytics</span>
+          <span>Ver Análisis Completo</span>
+        </button>
+
+      </div><!-- /screen-scroll -->
+
+      <div class="bottom-bar">
+        <button class="btn-secondary btn-full" onclick="contactExpert()">
+          <span class="material-symbols-rounded">support_agent</span>
+          <span>Contactar tasador profesional</span>
+        </button>
+        <p class="bottom-note">Esta es una estimación automática basada en datos históricos. Para una valoración legal, solicita una tasación oficial.</p>
+      </div>
+    </section>
+
+
+    <!-- ──────────────────────────────────────
+         PASO 3 · Análisis de Mercado
+         ────────────────────────────────────── -->
+    <section id="step-3" class="screen" aria-label="Análisis de Mercado">
+      <div class="screen-scroll">
+
+        <!-- Estimación actual -->
+        <div class="card estimation-card">
+          <div class="estimation-card__top">
+            <span class="estimation-eyebrow">ESTIMACIÓN ACTUAL</span>
+            <span class="confidence-chip" id="analysis-conf-chip">Alta Confianza</span>
+          </div>
+          <p class="estimation-price" id="analysis-price">—</p>
+          <div class="estimation-meta">
+            <span class="positive" id="monthly-change">—</span>
+            <span class="muted"> · Margen +/- <span id="margin-pct">3</span>%</span>
+          </div>
+        </div>
+
+        <!-- Alerta de mercado -->
+        <div class="alert-card alert-card--green" id="market-alert">
+          <span class="material-symbols-rounded alert-icon">trending_up</span>
+          <div>
+            <strong id="alert-title">Momento Óptimo para Vender</strong>
+            <p id="alert-desc">El mercado local está al alza con baja oferta disponible.</p>
+          </div>
+        </div>
+
+        <!-- Evolución del precio -->
+        <div class="chart-section">
+          <div class="chart-header">
+            <div>
+              <h3 class="section-title">Evolución del Precio</h3>
+              <p class="chart-subtitle">Histórico últimos 12 meses</p>
+            </div>
+            <div class="chart-kpi">
+              <p class="chart-kpi__value" id="price-per-sqft">—</p>
+              <p class="chart-kpi__trend positive" id="kpi-trend">—</p>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="price-chart" aria-label="Gráfico de evolución de precios"></canvas>
+          </div>
+        </div>
+
+        <!-- Impacto de características -->
+        <div class="impacts-section">
+          <div class="impacts-header">
+            <h3 class="section-title">Impacto de Características</h3>
+            <button class="icon-btn-sm" aria-label="Información sobre el impacto">
+              <span class="material-symbols-rounded">info</span>
+            </button>
+          </div>
+          <div class="impacts-list" id="impacts-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Comparativa de barrio -->
+        <div class="neighborhood-card" aria-label="Comparativa de barrio">
+          <div class="neighborhood-card__overlay">
+            <div class="neighborhood-card__icon">
+              <span class="material-symbols-rounded">location_city</span>
+            </div>
+            <div>
+              <p class="neighborhood-card__label">Comparativa de Barrio</p>
+              <p class="neighborhood-card__value" id="neighborhood-text">
+                14 Propiedades similares vendidas recientemente
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /screen-scroll -->
+
+      <div class="bottom-bar bottom-bar--duo">
+        <button class="btn-primary btn-full" onclick="contactExpert()">
+          <span class="material-symbols-rounded">support_agent</span>
+          <span>Consultar Experto</span>
+        </button>
+        <button class="btn-icon" aria-label="Guardar informe" onclick="saveReport()">
+          <span class="material-symbols-rounded">save_alt</span>
+        </button>
+      </div>
+    </section>
+
+  </div><!-- /screens-container -->
+
+</div><!-- /app-shell -->
+
+
+<!-- ════════════ Loading overlay ════════════ -->
+<div id="loading-overlay" class="loading-overlay hidden" role="alert" aria-live="polite">
+  <div class="loading-card">
+    <div class="loading-spinner" aria-hidden="true"></div>
+    <p class="loading-title" id="loading-text">Calculando valoración…</p>
+    <p class="loading-sub">Analizando datos de mercado de la zona</p>
+  </div>
+</div>
+
+<!-- ════════════ Toast ════════════ -->
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="app.js" type="module"></script>
+</body>
+</html>
