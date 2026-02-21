@@ -90,3 +90,45 @@ source .venv/bin/activate
 uv pip install -r Model/requirements.txt
 ```
 
+---
+
+## Ejecutar el frontend en localhost
+
+El frontend es una aplicación web simple ubicada en la carpeta `frontend/`.
+
+### Requisitos
+- Tener instalado Python (para un simple servidor) o Node.js (opcional).
+
+### Opción 1: Usar Python (recomendado para pruebas rápidas)
+
+Desde la raíz del proyecto o dentro de la carpeta `frontend/`, ejecuta:
+
+```bash
+cd frontend
+python3 -m http.server 8080
+```
+
+Luego abre tu navegador y accede a:
+
+```
+http://localhost:8080
+```
+
+### Opción 2: Usar Node.js (si tienes instalado)
+
+Puedes instalar un servidor estático como `serve`:
+
+```bash
+npm install -g serve
+cd frontend
+serve -l 8080
+```
+
+Y acceder igualmente a:
+
+```
+http://localhost:8080
+```
+
+Esto cargará la interfaz web para consultar el modelo.
+

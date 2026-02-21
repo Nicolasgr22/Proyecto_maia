@@ -22,3 +22,7 @@ Icon?
 # Excluir ejecutables de Python
 python
 python.exe
+.python-version
+
+# Excluir llaves
+*.pem
