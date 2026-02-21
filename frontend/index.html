@@ -89,7 +89,7 @@
             </p>
             <div class="form-grid">
 
-              <!-- sqft_living — full width -->
+              <!-- sqft_living — full width, obligatorio -->
               <div class="field-group field--full">
                 <label class="field-label" for="sqft-living">ÁREA CONSTRUIDA HABITABLE</label>
                 <div class="text-field">
@@ -99,25 +99,17 @@
                 </div>
               </div>
 
-              <!-- sqft_lot -->
-              <div class="field-group">
-                <label class="field-label" for="sqft-lot">ÁREA DEL TERRENO</label>
+              <!-- sqft_lot — opcional, full width -->
+              <div class="field-group field--full">
+                <div class="field-label-row">
+                  <label class="field-label" for="sqft-lot">ÁREA DEL TERRENO</label>
+                  <span class="optional-tag">opcional</span>
+                </div>
                 <div class="text-field">
                   <input type="number" id="sqft-lot" name="sqft_lot"
                     placeholder="Ej: 525" min="50" max="18500" inputmode="numeric" />
                   <span class="field-suffix">m²</span>
                 </div>
-              </div>
-
-              <!-- sqft_above -->
-              <div class="field-group">
-                <label class="field-label" for="sqft-above">ÁREA SOBRE EL NIVEL DEL SUELO</label>
-                <div class="text-field">
-                  <input type="number" id="sqft-above" name="sqft_above"
-                    placeholder="Ej: 110" min="0" max="1400" inputmode="numeric" />
-                  <span class="field-suffix">m²</span>
-                </div>
-                <span class="field-hint">Superficie sin incluir sótano</span>
               </div>
 
             </div>
