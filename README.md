@@ -204,4 +204,4 @@ Los datos se mantienen aunque se detenga y se reinicie el stack con docker compo
 
 * miniodata (MinIO: artefactos como modelos, gráficos, etc.)
 
-Solo se borran si se ejecuta docker compose down -v o eliminas los volúmenes manualmente.
+Solo se borran si se ejecuta docker compose down -v o se eliminan los volúmenes manualmente.
