@@ -132,3 +132,76 @@ http://localhost:8080
 
 Esto cargará la interfaz web para consultar el modelo.
 
+# Ejecución de ML Flow con Docker Compose
+
+Este proyecto puede correr una infraestructura que usa MLFlow empaquetado.
+MLFlow, a su vez usa una imagen de Postgres para guardar los experimentos, y una
+alternativa local a S3 llamada Minio que se alojan en el contenedor.
+
+Para correr el contenedor con todo sigue los siguientes comandos:
+
+## Ejecutar el stack con Docker Compose (MLflow + Postgres + MinIO + App)
+
+Este proyecto incluye un stack local para tracking de experimentos con **MLflow**, persistencia de metadata en **Postgres** y almacenamiento de artefactos (modelos, plots, etc.) en **MinIO** (compatible con S3). Además, el servicio **app** ejecuta el entrenamiento (`Model/train.py`) y registra runs en MLflow.
+
+### Requisitos
+- Docker Desktop instalado
+- Docker Compose (incluido en Docker Desktop)
+
+### Levantar los contenedores
+
+Desde la raíz del repositorio (donde está `docker-compose.yml`):
+
+```bash
+docker compose up --build
+```
+### Levantarlo en un segundo plano
+```bash
+docker compose up --build -d
+```
+
+### Ver logs
+```bash
+docker compose logs -f
+```
+
+
+### Ver logs de un servicio específico
+```bash
+docker compose logs -f mlflow
+```
+
+
+### Puertos de cada componente
+| Componente                      | Servicio   | Host/URL                                       | Puerto Host | Puerto Interno |
+| ------------------------------- | ---------- | ---------------------------------------------- | ----------- | -------------- |
+| MLflow Tracking UI/API          | `mlflow`   | [http://localhost:5001](http://localhost:5001) | 5001        | 5001           |
+| Postgres (backend store MLflow) | `postgres` | localhost:5433                                 | 5433        | 5432           |
+| MinIO S3 API (artifacts)        | `minio`    | [http://localhost:9000](http://localhost:9000) | 9000        | 9000           |
+| MinIO Console (UI)              | `minio`    | [http://localhost:9001](http://localhost:9001) | 9001        | 9001           |
+
+### Credenciales por defecto (desarrollo)
+
+**Postgres**
+
+* DB: mlflow
+
+* User: mlflow
+
+* Password: mlflow
+
+**MinIO Console**
+
+* User: minio
+
+* Password: minio123456
+
+### Persistencia de datos
+
+Los datos se mantienen aunque se detenga y se reinicie el stack con docker compose down / up porque se usan volúmenes Docker:
+
+* pgdata (Postgres: metadata de experimentos/runs)
+
+* miniodata (MinIO: artefactos como modelos, gráficos, etc.)
+
+Solo se borran si se ejecuta docker compose down -v o eliminas los volúmenes manualmente.
