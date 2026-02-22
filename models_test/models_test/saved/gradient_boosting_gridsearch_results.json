@@ -1,0 +1,14 @@
+{
+    "model": "GradientBoosting_GridSearch",
+    "params": {
+        "learning_rate": 0.1,
+        "max_depth": 5,
+        "min_samples_leaf": 2,
+        "min_samples_split": 2,
+        "n_estimators": 300
+    },
+    "metrics": {
+        "RMSE": 18357320488.64754,
+        "R\u00b2": 0.8785704476926475
+    }
+}

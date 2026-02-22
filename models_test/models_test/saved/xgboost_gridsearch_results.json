@@ -1,0 +1,14 @@
+{
+    "model": "XGBoost_GridSearch",
+    "params": {
+        "colsample_bytree": 0.8,
+        "learning_rate": 0.1,
+        "max_depth": 4,
+        "n_estimators": 500,
+        "subsample": 0.8
+    },
+    "metrics": {
+        "RMSE": 17303147677.457428,
+        "R\u00b2": 0.8855435640903571
+    }
+}

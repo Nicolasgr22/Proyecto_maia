@@ -10,7 +10,7 @@ from xgboost import XGBRegressor
 os.makedirs("models_test/saved", exist_ok=True)
 
 # 2. Cargar datos
-df = pd.read_csv("Data/Data_Seattle.csv")
+df = pd.read_csv("../Data/Data_Seattle.csv")
 
 # 3. Procesar columna 'date'
 df["date"] = pd.to_datetime(df["date"], format="%Y%m%dT%H%M%S", errors="coerce")
@@ -56,7 +56,7 @@ grid_search.fit(X_train, y_train)
 best_xgb = grid_search.best_estimator_
 y_pred_best = best_xgb.predict(X_test)
 
-rmse_best = mean_squared_error(y_test, y_pred_best, squared=False)
+rmse_best = mean_squared_error(y_test, y_pred_best)
 r2_best = r2_score(y_test, y_pred_best)
 
 print("Mejores parámetros:", grid_search.best_params_)

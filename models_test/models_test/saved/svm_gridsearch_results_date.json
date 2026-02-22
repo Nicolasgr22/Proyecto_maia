@@ -1,0 +1,12 @@
+{
+    "model": "SVM_GridSearch",
+    "params": {
+        "C": 10,
+        "epsilon": 0.5,
+        "kernel": "linear"
+    },
+    "metrics": {
+        "RMSE": 77463797079.70927,
+        "R\u00b2": 0.4875943792976889
+    }
+}
