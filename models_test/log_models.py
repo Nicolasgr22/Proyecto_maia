@@ -1,5 +1,6 @@
 import mlflow
 import mlflow.sklearn
+import mlflow.xgboost
 import joblib
 import json
 
@@ -15,7 +16,11 @@ def log_model(model, data, experiment):
             mlflow.log_param(param, value)
 
         # Registre el modelo
-        mlflow.sklearn.log_model(model, name=data["model"])
+        if data["model"] == "XGBoost_GridSearch":
+            mlflow.xgboost.log_model(model, data["model"])
+
+        else:
+            mlflow.sklearn.log_model(model, data["model"])
 
         # Cree y registre la métrica de interés
         mlflow.log_metric("mse", data["metrics"]["RMSE"])
@@ -25,7 +30,7 @@ def main():
 
     models = ('models_test/saved/xgboost_gridsearch.pkl', "models_test/saved/gradient_boosting_gridsearch.pkl", "models_test/saved/random_forest_gridsearch.pkl","models_test/saved/svm_gridsearch.pkl","models_test/saved/svm_gridsearch_date.pkl")
     configs = ("models_test/saved/xgboost_gridsearch_results.json", "models_test/saved/gradient_boosting_gridsearch_results.json", "models_test/saved/random_forest_gridsearch_results.json", "models_test/saved/svm_gridsearch_results.json", "models_test/saved/svm_gridsearch_results_date.json")
-    experiment = mlflow.set_experiment("housing_price")
+    experiment = mlflow.set_experiment("/housing_price")
 
     for model_path, config_path in zip(models, configs):
 
@@ -46,14 +51,14 @@ def main():
     with open(config_path) as json_file:
         data = json.load(json_file)
 
-    with mlflow.start_run(run_name=data["model"], experiment_id=experiment.experiment_id):
+    with mlflow.start_run(run_name='Selected_XGB_Model', experiment_id=experiment.experiment_id):
 
         for param, value in data['best_params'].items():
             # Registre los parámetros
             mlflow.log_param(param, value)
 
         # Registre el modelo
-        mlflow.sklearn.log_model(model, name="Modelo Seleccionado XGBoost")
+        mlflow.xgboost.log_model(model, "Modelo Seleccionado XGBoost")
 
         # Cree y registre la métrica de interés
         mlflow.log_metric("mse", (data["rmse"])**2)
