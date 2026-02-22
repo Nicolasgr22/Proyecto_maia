@@ -9,7 +9,12 @@ import mlflow.sklearn
 import numpy as np
 
 # Cargar datos
-data = pd.read_csv("../data/Data_Seattle.csv")
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+DATA_PATH = BASE_DIR.parent / "Data" / "Data_Seattle.csv"
+
+data = pd.read_csv(DATA_PATH)
 
 # Definir columnas relevantes (excluyendo id, date, price)
 features = [

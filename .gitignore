@@ -26,3 +26,8 @@ python.exe
 
 # Excluir llaves
 *.pem
+
+# Artefactos locales del proyecto
+mlruns/
+xgb_model.pkl
+config.json
