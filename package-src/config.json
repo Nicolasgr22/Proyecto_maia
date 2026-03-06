@@ -1,0 +1,31 @@
+{
+    "features": [
+        "bedrooms",
+        "bathrooms",
+        "sqft_living",
+        "sqft_lot",
+        "floors",
+        "waterfront",
+        "view",
+        "condition",
+        "grade",
+        "sqft_above",
+        "sqft_basement",
+        "yr_built",
+        "yr_renovated",
+        "zipcode",
+        "lat",
+        "long",
+        "sqft_living15",
+        "sqft_lot15"
+    ],
+    "best_params": {
+        "xgb__learning_rate": 0.1,
+        "xgb__max_depth": 5,
+        "xgb__n_estimators": 200
+    },
+    "best_score": -15945465095.12394,
+    "rmse": 135796.12148269484,
+    "mae": 69342.02844825592,
+    "r2": 0.8767238486892757
+}

@@ -1,0 +1,35 @@
+Metadata-Version: 2.4
+Name: model-avaluo
+Version: 0.0.1
+Summary: Empaquetamiento de modelo de avaluo de propiedades
+Home-page: 
+Author: anferiro
+Author-email: af.rinconr1@uniandes.edu.co
+License: BSD-3
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Requires-Python: >=3.10.9
+Description-Content-Type: text/markdown
+Requires-Dist: pandas
+Requires-Dist: scikit-learn
+Requires-Dist: xgboost
+Requires-Dist: joblib
+Requires-Dist: mlflow
+Requires-Dist: setuptools
+Requires-Dist: strictyaml
+Requires-Dist: numpy
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: license
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+Empaquetamiento de modelo de avaluo de propiedades

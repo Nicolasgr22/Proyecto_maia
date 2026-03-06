@@ -1,0 +1,53 @@
+# Nombre del paquete
+package_name: modelo-avaluo
+
+# Archivos de datos
+data_file: data_seattle.csv
+test_data_file: data_seattle_test.csv
+
+# Variables
+# Objetivo
+target: price
+
+features:
+  - bedrooms
+  - bathrooms
+  - sqft_living
+  - sqft_lot
+  - floors
+  - waterfront
+  - view
+  - condition
+  - grade
+  - sqft_above
+  - sqft_basement
+  - yr_built
+  - yr_renovated
+  - zipcode
+  - lat
+  - long
+  - sqft_living15
+  - sqft_lot15
+
+# pipelines
+pipeline_name: modelo-avaluo
+pipeline_save_file: modelo-avaluo-output
+
+# fracción del conjunto de prueba
+test_size: 0.25
+
+# semilla
+random_state: 42
+
+# hiperparámetros del modelo 
+n_estimators:
+  - 100
+  - 200
+
+max_depth:
+  - 3
+  - 5
+learning_rate:
+  - 0.05
+  - 0.1
+objective: reg:squarederror
