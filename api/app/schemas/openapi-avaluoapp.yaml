@@ -1,0 +1,961 @@
+openapi: 3.0.3
+
+info:
+  title: Avaluo App API
+  description: |
+    API REST para la valoración automática de inmuebles mediante Machine Learning.
+    El modelo predictivo está entrenado sobre datos del mercado inmobiliario y estima
+    el precio de mercado de una propiedad a partir de sus características físicas y ubicación.
+
+    ## Flujo principal de la aplicación
+    1. **Captura de datos** → El usuario introduce las características del inmueble (Pantalla 1).
+    2. **Valoración** → El sistema devuelve la estimación de precio con nivel de confianza (Pantalla 2).
+    3. **Análisis de mercado** → El sistema proporciona evolución de precios e impacto de características (Pantalla 3).
+
+    ## Notas del modelo ML
+    - El modelo está basado en regresión entrenada sobre datos del mercado de vivienda.
+    - Los precios se expresan en la moneda configurada (EUR por defecto).
+    - El intervalo de confianza se calcula mediante técnicas de bootstrapping sobre el modelo.
+  version: 1.0.0
+  
+paths:
+
+  # ── Pantalla 1 → Pantalla 2 ─────────────────────────────────────────────
+  /valuations:
+    post:
+      tags:
+        - Valoraciones
+      summary: Solicitar valoración de un inmueble
+      description: |
+        Recibe las características físicas y de ubicación de un inmueble y devuelve
+        la estimación de precio generada por el modelo ML, el nivel de confianza
+        y un resumen del estado del mercado en la zona.
+
+        **Corresponde a:** botón "Obtener Valoración" de la Pantalla 1.
+      operationId: createValuation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PropertyInput'
+            examples:
+              piso_reformado:
+                summary: Piso reformado con 3 habitaciones
+                value:
+                  area: 95
+                  rooms: 3
+                  bathrooms: 2
+                  floor: 2
+                  grade: 13
+                  location:
+                    latitud: 40.4168
+                    longitud: -3.7038
+      responses:
+        '201':
+          description: Valoración generada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValuationResponse'
+              examples:
+                ejemplo_valoracion:
+                  summary: Valoración con confianza alta
+                  value:
+                    id: "val_a1b2c3d4"
+                    precio_estimado:
+                      minimo: 450000
+                      maximo: 485000
+                      punto_medio: 467500
+                      moneda: "EUR"
+                    confianza: "ALTA"
+                    margen_error_pct: 3.2
+                    mercado:
+                      estado: "CALIENTE"
+                      precio_medio_zona: 442500
+                      tendencia_anual_pct: 4.2
+                      descripcion: "Mercado muy activo en tu zona"
+                    nota: "Esta estimación es un 5% superior a la media de la zona"
+                    creado_en: "2025-10-15T10:30:00Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /valuations/{valuationId}:
+    get:
+      tags:
+        - Valoraciones
+      summary: Obtener una valoración por ID
+      description: |
+        Recupera el detalle completo de una valoración previamente generada.
+        Útil para compartir o volver a consultar un resultado sin repetir el cálculo.
+      operationId: getValuationById
+      parameters:
+        - $ref: '#/components/parameters/valuationId'
+      responses:
+        '200':
+          description: Valoración encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValuationResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ── Pantalla 3: Análisis de Mercado ────────────────────────────────────
+  /valuations/{valuationId}/market-analysis:
+    get:
+      tags:
+        - Valoraciones
+        - Mercado
+      summary: Análisis de mercado asociado a una valoración
+      description: |
+        Devuelve el análisis profundo de mercado vinculado a una valoración concreta:
+        evolución mensual de precios, impacto de cada característica del inmueble,
+        alerta de momento óptimo de venta y comparativa de propiedades similares.
+
+        **Corresponde a:** Pantalla 3 "Análisis de Mercado".
+      operationId: getMarketAnalysisByValuation
+      parameters:
+        - $ref: '#/components/parameters/valuationId'
+        - name: meses_historico
+          in: query
+          description: Número de meses de histórico de precios a devolver (máx. 24)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 24
+            default: 12
+      responses:
+        '200':
+          description: Análisis de mercado generado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketAnalysis'
+              examples:
+                analisis_ejemplo:
+                  summary: Análisis con momento óptimo de venta
+                  value:
+                    valoracion_id: "val_a1b2c3d4"
+                    estimacion_actual:
+                      precio: 350000
+                      moneda: "EUR"
+                      confianza: "ALTA"
+                      variacion_mensual_pct: 3.2
+                      margen_error_pct: 3.0
+                    alerta_mercado:
+                      activa: true
+                      tipo: "MOMENTO_OPTIMO_VENTA"
+                      mensaje: "Momento Óptimo para Vender"
+                    evolucion_precio_m2:
+                      precio_actual_m2: 4200
+                      variacion_anual_pct: 12.5
+                      serie_historica:
+                        - mes: "2024-10"
+                          precio_m2: 3750
+                        - mes: "2024-11"
+                          precio_m2: 3810
+                        - mes: "2024-12"
+                          precio_m2: 3900
+                        - mes: "2025-01"
+                          precio_m2: 3960
+                        - mes: "2025-02"
+                          precio_m2: 4050
+                        - mes: "2025-03"
+                          precio_m2: 4200
+                    impacto_caracteristicas:
+                      - caracteristica: "Estado de Conservación"
+                        impacto_pct: 8.0
+                        descripcion: "A Estrenar aumenta el valor respecto a la media"
+                      - caracteristica: "Ubicación Premium"
+                        impacto_pct: 12.0
+                        descripcion: "Zona de alta demanda"
+                      - caracteristica: "Sin Ascensor"
+                        impacto_pct: -10.0
+                        descripcion: "La ausencia de ascensor reduce el valor"
+                      - caracteristica: "Tensión de Mercado"
+                        impacto_pct: 4.0
+                        descripcion: "Alta demanda en la zona"
+                    comparativa_barrio:
+                      total_propiedades_similares: 14
+                      precio_medio_comparables: 342000
+                      rango_precios:
+                        minimo: 310000
+                        maximo: 390000
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ── Mercado: Tendencias y Estado ────────────────────────────────────────
+  /market/trends:
+    get:
+      tags:
+        - Mercado
+      summary: Tendencias de precios por zona geográfica
+      description: |
+        Devuelve la evolución histórica del precio por sqft en un área dada,
+        expresada como serie temporal mensual.
+      operationId: getMarketTrends
+      parameters:
+        - name: latitud
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+            minimum: -90
+            maximum: 90
+          example: 40.4168
+        - name: longitud
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+            minimum: -180
+            maximum: 180
+          example: -3.7038
+        - name: radio_km
+          in: query
+          description: Radio de búsqueda en kilómetros
+          schema:
+            type: number
+            format: double
+            minimum: 0.5
+            maximum: 50
+            default: 2.0
+        - name: meses
+          in: query
+          description: Número de meses de histórico
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 24
+            default: 12
+      responses:
+        '200':
+          description: Serie de tendencias de precio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketTrends'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /market/status:
+    get:
+      tags:
+        - Mercado
+      summary: Estado actual del mercado en una zona
+      description: |
+        Indica si el mercado en la ubicación consultada está Frío, Equilibrado o Caliente,
+        junto con indicadores clave (oferta, demanda, tiempo medio de venta).
+      operationId: getMarketStatus
+      parameters:
+        - name: latitud
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+          example: 40.4168
+        - name: longitud
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+          example: -3.7038
+        - name: radio_km
+          in: query
+          schema:
+            type: number
+            format: double
+            default: 2.0
+      responses:
+        '200':
+          description: Estado del mercado en la zona
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketStatus'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ── Inmuebles Comparables ────────────────────────────────────────────────
+  /properties/comparables:
+    get:
+      tags:
+        - Inmuebles
+      summary: Propiedades similares vendidas recientemente
+      description: |
+        Devuelve una lista de propiedades comparables vendidas en la zona,
+        utilizadas como referencia para validar la estimación del modelo ML.
+      operationId: getComparableProperties
+      parameters:
+        - name: latitud
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: longitud
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: superficie_min
+          in: query
+          schema:
+            type: number
+            format: double
+        - name: superficie_max
+          in: query
+          schema:
+            type: number
+            format: double
+        - name: habitaciones
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: radio_km
+          in: query
+          schema:
+            type: number
+            format: double
+            default: 2.0
+        - name: meses_atras
+          in: query
+          description: Considerar ventas de los últimos N meses
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 36
+            default: 6
+        - name: limite
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+      responses:
+        '200':
+          description: Lista de propiedades comparables
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    description: Total de propiedades encontradas
+                    example: 14
+                  propiedades:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ComparableProperty'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /properties/characteristic-impact:
+    post:
+      tags:
+        - Inmuebles
+      summary: Impacto de características en el precio
+      description: |
+        Calcula cuánto aporta o resta cada característica del inmueble al precio final,
+        usando valores SHAP del modelo ML para garantizar la explicabilidad.
+      operationId: getCharacteristicImpact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PropertyInput'
+      responses:
+        '200':
+          description: Impacto de cada característica calculado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  precio_base:
+                    type: number
+                    description: Precio base del modelo (sin características específicas)
+                    example: 320000
+                  precio_final:
+                    type: number
+                    description: Precio final estimado
+                    example: 350000
+                  impactos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CharacteristicImpact'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ── Health ───────────────────────────────────────────────────────────────
+  /health:
+    get:
+      tags:
+        - Salud
+      summary: Estado del servicio
+      description: Verifica que la API y el modelo ML están operativos.
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Servicio operativo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+                  modelo_ml:
+                    type: string
+                    example: "ok"
+                  version_api:
+                    type: string
+                    example: "1.0.0"
+                  timestamp:
+                    type: string
+                    format: date-time
+        '503':
+          description: Servicio no disponible
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# COMPONENTS
+# ─────────────────────────────────────────────────────────────────────────────
+components:
+
+  # ── Parámetros reutilizables ─────────────────────────────────────────────
+  parameters:
+    valuationId:
+      name: valuationId
+      in: path
+      required: true
+      description: Identificador único de la valoración
+      schema:
+        type: string
+        pattern: '^val_[a-z0-9]{8}$'
+      example: "val_a1b2c3d4"
+
+  # ── Respuestas reutilizables ─────────────────────────────────────────────
+  responses:
+    BadRequest:
+      description: Solicitud con parámetros inválidos
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            codigo: "INVALID_INPUT"
+            mensaje: "El campo 'superficie' es obligatorio y debe ser mayor que 0"
+            detalle: []
+
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            codigo: "NOT_FOUND"
+            mensaje: "Valoración no encontrada"
+            detalle: []
+
+    UnprocessableEntity:
+      description: Datos válidos en formato pero no procesables por el modelo
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            codigo: "MODEL_UNPROCESSABLE"
+            mensaje: "La combinación de características está fuera del dominio del modelo"
+            detalle: ["superficie=2000 supera el rango de entrenamiento (20-500 sqft)"]
+
+    InternalServerError:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            codigo: "INTERNAL_ERROR"
+            mensaje: "Error inesperado. Por favor, inténtelo de nuevo."
+            detalle: []
+
+  # ── Schemas ──────────────────────────────────────────────────────────────
+  schemas:
+
+    # ── Input: Datos del Inmueble (Pantalla 1) ──────────────────────────
+    PropertyInput:
+      type: object
+      description: Property features for requesting the appraisal
+      required:
+        - sqft_living
+        - rooms
+        - bathrooms
+        - floor
+        - grade
+        - location
+      properties:
+        sqft_living:
+          type: number
+          format: double
+          description: Built area in square meters
+          example: 95
+        sqft_lot:
+          type: number
+          format: double
+          description: Lot area in square meters
+          example: 150
+        sqft_basement:
+          type: number
+          format: double
+          description: Basement area in square meters
+          example: 50
+        rooms:
+          type: integer
+          description: Number of rooms
+          example: 3
+        bathrooms:
+          type: integer
+          description: Number of bathrooms (includes half-baths)
+          example: 2
+        floor:
+          type: float
+          description: Number od floors within the property
+          minimum: 1
+          example: 2
+        condition:
+          type: integer
+          description: Overall condition of the property
+          minimum: 1
+          maximum: 5
+          example: 3
+        grade:
+          type: integer
+          description: Indicates the construction quality in the property, with values from 1 to 13
+          minimum: 1
+          maximum: 13
+          example: 12
+        lot_area:
+          type: number
+          format: double
+          description: Lot area in sqft (applies to single-family homes)
+          minimum: 0
+          example: 250
+        year_built:
+          type: integer
+          description: Year the property was built
+          minimum: 1800
+          maximum: 2025
+          example: 1998
+        year_renovated:
+          type: integer
+          description: Year of last major renovation (if applicable)
+          minimum: 1800
+          maximum: 2025
+          example: 2019
+        location:
+          $ref: '#/components/schemas/Location'
+
+    # ── Ubicación ────────────────────────────────────────────────────────
+    Location:
+      type: object
+      description: Geographic location data of the property
+      required:
+        - latitude
+        - longitude
+      properties:
+        latitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+          example: 40.4168
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+          example: -3.7038
+        postal_code:
+          type: string
+          pattern: '^\d{5}$'
+          example: "28013"
+        city:
+          type: string
+          example: "Madrid"
+        province:
+          type: string
+          example: "Madrid"
+
+    # ── Output: Valoración (Pantalla 2) ─────────────────────────────────
+    ValuationResponse:
+      type: object
+      description: Resultado completo de la valoración generada por el modelo ML
+      properties:
+        id:
+          type: string
+          description: Identificador único de la valoración
+          example: "val_a1b2c3d4"
+        precio_estimado:
+          type: object
+          description: Rango de precio estimado con intervalo de confianza
+          properties:
+            minimo:
+              type: number
+              description: Límite inferior del intervalo de precio
+              example: 450000
+            maximo:
+              type: number
+              description: Límite superior del intervalo de precio
+              example: 485000
+            punto_medio:
+              type: number
+              description: Estimación puntual central del modelo
+              example: 467500
+            moneda:
+              type: string
+              description: Código ISO 4217 de la moneda
+              example: "EUR"
+        confianza:
+          type: string
+          description: |
+            Nivel de confianza del modelo para esta estimación:
+            - `ALTA`: Margen de error < 5%
+            - `MEDIA`: Margen de error 5-10%
+            - `BAJA`: Margen de error > 10%
+          enum:
+            - ALTA
+            - MEDIA
+            - BAJA
+          example: "ALTA"
+        margen_error_pct:
+          type: number
+          description: Margen de error del modelo en porcentaje
+          example: 3.2
+        mercado:
+          $ref: '#/components/schemas/MarketSummary'
+        nota:
+          type: string
+          description: Mensaje contextual sobre la valoración respecto a la media de zona
+          example: "Esta estimación es un 5% superior a la media de la zona"
+        inmueble:
+          $ref: '#/components/schemas/PropertyInput'
+        creado_en:
+          type: string
+          format: date-time
+          description: Timestamp UTC de creación de la valoración
+          example: "2025-10-15T10:30:00Z"
+
+    # ── Resumen de Mercado (Pantalla 2) ──────────────────────────────────
+    MarketSummary:
+      type: object
+      description: Resumen del estado del mercado en la zona del inmueble
+      properties:
+        estado:
+          type: string
+          description: |
+            Temperatura del mercado en la zona:
+            - `FRIO`: Baja demanda, exceso de oferta
+            - `EQUILIBRADO`: Oferta y demanda balanceadas
+            - `CALIENTE`: Alta demanda, escasa oferta
+          enum:
+            - FRIO
+            - EQUILIBRADO
+            - CALIENTE
+          example: "CALIENTE"
+        precio_medio_zona:
+          type: number
+          description: Precio medio de propiedades similares en la zona (EUR)
+          example: 442500
+        tendencia_anual_pct:
+          type: number
+          description: Variación porcentual del precio en los últimos 12 meses
+          example: 4.2
+        descripcion:
+          type: string
+          description: Descripción legible del estado del mercado
+          example: "Mercado muy activo en tu zona"
+
+    # ── Análisis de Mercado (Pantalla 3) ─────────────────────────────────
+    MarketAnalysis:
+      type: object
+      description: Análisis detallado del mercado para una valoración concreta
+      properties:
+        valoracion_id:
+          type: string
+          example: "val_a1b2c3d4"
+        estimacion_actual:
+          type: object
+          properties:
+            precio:
+              type: number
+              example: 350000
+            moneda:
+              type: string
+              example: "EUR"
+            confianza:
+              type: string
+              enum: [ALTA, MEDIA, BAJA]
+              example: "ALTA"
+            variacion_mensual_pct:
+              type: number
+              description: Variación del precio estimado respecto al mes anterior
+              example: 3.2
+            margen_error_pct:
+              type: number
+              example: 3.0
+        alerta_mercado:
+          type: object
+          description: Alerta sobre condición destacada del mercado
+          properties:
+            activa:
+              type: boolean
+              example: true
+            tipo:
+              type: string
+              enum:
+                - MOMENTO_OPTIMO_VENTA
+                - MERCADO_EN_CAIDA
+                - ALTA_VOLATILIDAD
+                - ZONA_REVALORIZACION
+              example: "MOMENTO_OPTIMO_VENTA"
+            mensaje:
+              type: string
+              example: "Momento Óptimo para Vender"
+        evolucion_precio_m2:
+          type: object
+          description: Evolución del precio por metro cuadrado
+          properties:
+            precio_actual_m2:
+              type: number
+              description: Precio actual por sqft en la zona
+              example: 4200
+            variacion_anual_pct:
+              type: number
+              description: Variación anual del precio por sqft
+              example: 12.5
+            serie_historica:
+              type: array
+              description: Serie mensual del precio por sqft
+              items:
+                $ref: '#/components/schemas/PriceDataPoint'
+        impacto_caracteristicas:
+          type: array
+          description: Impacto individual de cada característica del inmueble en el precio
+          items:
+            $ref: '#/components/schemas/CharacteristicImpact'
+        comparativa_barrio:
+          type: object
+          description: Comparativa con propiedades similares vendidas en la zona
+          properties:
+            total_propiedades_similares:
+              type: integer
+              description: Número de propiedades comparables encontradas
+              example: 14
+            precio_medio_comparables:
+              type: number
+              description: Precio medio de las propiedades comparables
+              example: 342000
+            rango_precios:
+              type: object
+              properties:
+                minimo:
+                  type: number
+                  example: 310000
+                maximo:
+                  type: number
+                  example: 390000
+
+    # ── Tendencias de Mercado ────────────────────────────────────────────
+    MarketTrends:
+      type: object
+      properties:
+        zona:
+          $ref: '#/components/schemas/Ubicacion'
+        radio_km:
+          type: number
+          example: 2.0
+        precio_actual_m2:
+          type: number
+          example: 4200
+        variacion_anual_pct:
+          type: number
+          example: 12.5
+        serie_historica:
+          type: array
+          items:
+            $ref: '#/components/schemas/PriceDataPoint'
+
+    # ── Estado del Mercado ───────────────────────────────────────────────
+    MarketStatus:
+      type: object
+      properties:
+        zona:
+          $ref: '#/components/schemas/Ubicacion'
+        estado:
+          type: string
+          enum: [FRIO, EQUILIBRADO, CALIENTE]
+          example: "CALIENTE"
+        indice_demanda:
+          type: number
+          description: Índice de demanda normalizado de 0 a 100
+          minimum: 0
+          maximum: 100
+          example: 78
+        tiempo_medio_venta_dias:
+          type: integer
+          description: Tiempo medio de venta en días en la zona
+          example: 32
+        ratio_oferta_demanda:
+          type: number
+          description: Ratio oferta/demanda (< 1 = más demanda que oferta)
+          example: 0.7
+        descripcion:
+          type: string
+          example: "Alta demanda con escasa oferta disponible"
+
+    # ── Punto de Precio Histórico ────────────────────────────────────────
+    PriceDataPoint:
+      type: object
+      description: Precio por sqft para un mes concreto
+      properties:
+        mes:
+          type: string
+          description: Mes en formato YYYY-MM
+          pattern: '^\d{4}-(0[1-9]|1[0-2])$'
+          example: "2025-03"
+        precio_m2:
+          type: number
+          description: Precio por metro cuadrado en EUR
+          example: 4200
+
+    # ── Propiedad Comparable ─────────────────────────────────────────────
+    ComparableProperty:
+      type: object
+      description: Inmueble similar vendido recientemente en la zona
+      properties:
+        id:
+          type: string
+          example: "prop_xyz789"
+        superficie:
+          type: number
+          example: 88
+        habitaciones:
+          type: integer
+          example: 3
+        banos:
+          type: integer
+          example: 2
+        planta:
+          type: string
+          enum: [BAJO, BAJA_MEDIA, MEDIA_ALTA, ATICO]
+          example: "BAJA_MEDIA"
+        estado_conservacion:
+          type: string
+          enum: [A_REFORMAR, REFORMADO, A_ESTRENAR]
+          example: "REFORMADO"
+        precio_venta:
+          type: number
+          description: Precio de venta final en EUR
+          example: 335000
+        precio_m2:
+          type: number
+          description: Precio por metro cuadrado
+          example: 3807
+        fecha_venta:
+          type: string
+          format: date
+          example: "2025-08-12"
+        distancia_m:
+          type: number
+          description: Distancia al inmueble consultado en metros
+          example: 450
+        ubicacion:
+          $ref: '#/components/schemas/Ubicacion'
+
+    # ── Impacto de Característica (SHAP) ─────────────────────────────────
+    CharacteristicImpact:
+      type: object
+      description: Contribución de una característica al precio estimado (basado en valores SHAP)
+      properties:
+        caracteristica:
+          type: string
+          description: Nombre de la característica
+          example: "Estado de Conservación"
+        impacto_pct:
+          type: number
+          description: Impacto porcentual sobre el precio base (positivo = aumenta, negativo = disminuye)
+          example: 8.0
+        impacto_absoluto:
+          type: number
+          description: Impacto en valor monetario absoluto (EUR)
+          example: 25600
+        descripcion:
+          type: string
+          description: Explicación legible del impacto
+          example: "A Estrenar aumenta el valor respecto a la media"
+
+    # ── Error ────────────────────────────────────────────────────────────
+    Error:
+      type: object
+      description: Respuesta de error estándar
+      required:
+        - codigo
+        - mensaje
+      properties:
+        codigo:
+          type: string
+          description: Código de error interno
+          example: "INVALID_INPUT"
+        mensaje:
+          type: string
+          description: Mensaje de error legible
+          example: "El campo 'superficie' es obligatorio"
+        detalle:
+          type: array
+          description: Lista de errores de validación detallados
+          items:
+            type: string
+          example: ["superficie: debe ser mayor que 0", "habitaciones: requerido"]
+
+  # ── Security Schemes ─────────────────────────────────────────────────────
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token JWT obtenido en el endpoint de autenticación
+
+# Seguridad global: todos los endpoints requieren autenticación
+security:
+  - BearerAuth: []

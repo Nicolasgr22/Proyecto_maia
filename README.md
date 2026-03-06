@@ -1,6 +1,6 @@
 # Proyecto_maia
 
-![Python](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python)
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)
 
 
 ## Descripción del Proyecto

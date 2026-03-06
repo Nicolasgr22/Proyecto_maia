@@ -4,8 +4,8 @@
  *
  * Datos del modelo (CSV):
  *   bedrooms, bathrooms, sqft_living, sqft_lot, floors,
- *   waterfront, view, condition, grade, sqft_above,
- *   sqft_basement, yr_built, yr_renovated, zipcode, lat, long,
+ *   waterfront, view, condition, grade, sqft_basement,
+ *   yr_built, yr_renovated, zipcode, lat, long,
  *   sqft_living15, sqft_lot15
  *
  * API schema (PropertyInput):
@@ -239,7 +239,7 @@ function initAgeSlider() {
 // Form Data Collection
 // ─────────────────────────────────────────────────────────────
 
-// User inputs m² → model expects sqft
+// User inputs sqft → model expects sqft
 const M2_TO_SQFT = 10.7639;
 
 function collectFormData() {
@@ -258,9 +258,8 @@ function collectFormData() {
   const yrVal  = get('yr_built', '');
   const yr_built = yrVal ? (parseInt(yrVal, 10) || null) : null;
 
-  // m² inputs → convert to sqft for the model
+  // sqft inputs → convert to sqft for the model
   const lot_m2   = parseFloat(get('sqft_lot'));
-  const above_m2 = parseFloat(get('sqft_above'));
 
   return {
     // Core
@@ -271,9 +270,8 @@ function collectFormData() {
     condition:   parseInt(get('condition', 3), 10) || 3,
     grade:       parseInt(get('grade', 7), 10)     || 7,
 
-    // Areas (main form) — converted from m²
+    // Areas (main form) — converted from sqft
     sqft_lot:      lot_m2   ? lot_m2   * M2_TO_SQFT : null,
-    sqft_above:    above_m2 ? above_m2 * M2_TO_SQFT : null,
     sqft_basement,
 
     // Optional model features
