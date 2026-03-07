@@ -41,7 +41,7 @@ def validate_inputs(*, input_data: pd.DataFrame) -> Tuple[pd.DataFrame, Optional
 
 
 class DataInputSchema(BaseModel):
-    rooms: Optional[int] = None  # Number of rooms
+    bedrooms: Optional[int] = None  # Number of rooms
     bathrooms: Optional[float] = None  # Number of bathrooms (includes half-baths)
     sqft_living: Optional[float] = None  # Built area in square meters
     sqft_lot: Optional[float] = None  # Lot area in square meters

@@ -8,7 +8,15 @@ model/predict.py
 model/train.py
 model/train_pipeline.py
 model/config/__init__.py
+model/config/config.yml
 model/config/core.py
+model/datasets/__init__.py
+model/datasets/data_seattle.csv
+model/datasets/data_seattle_test.csv
+model/processing/__init__.py
+model/processing/data_manager.py
+model/processing/features.py
+model/processing/validation.py
 model/trained/modelo-avaluo-output0.0.1.pkl
 model_avaluo.egg-info/PKG-INFO
 model_avaluo.egg-info/SOURCES.txt
