@@ -6,7 +6,7 @@ from .PropertyInput import PropertyInput
 
 class ValuationResponse(BaseModel):
     id: str
-    precio_estimado: ValuationPrecioEstimado
+    precio_estimado: float
     confianza: str  # ALTA, MEDIA, BAJA
     margen_error_pct: float
     mercado: MarketSummary

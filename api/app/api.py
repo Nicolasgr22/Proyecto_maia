@@ -11,6 +11,7 @@ from model.predict import make_prediction
 
 from app import __version__, schemas
 from app.config import settings
+import uuid
 
 api_router = APIRouter()
 
@@ -34,14 +35,30 @@ async def predict(input_data: schemas.PropertyInput) -> Any:
     """
 
     input_df = pd.DataFrame([input_data.model_dump()])
-
     logger.info(f"Making prediction on inputs: {input_data.model_dump()}")
-    results = make_prediction(input_data=input_df.replace({np.nan: None}))
+    precio_estimado = make_prediction(input_data=input_df.replace({np.nan: None}))
+    if precio_estimado["errors"] is not None:
+        logger.warning(f"Prediction validation error: {precio_estimado.get('errors')}")
+        raise HTTPException(status_code=400, detail=json.loads(precio_estimado["errors"]))
 
-    if results["errors"] is not None:
-        logger.warning(f"Prediction validation error: {results.get('errors')}")
-        raise HTTPException(status_code=400, detail=json.loads(results["errors"]))
+    logger.info(f"Prediction results: {precio_estimado.get('predictions')}")
 
-    logger.info(f"Prediction results: {results.get('predictions')}")
+    market_summary = schemas.MarketSummary(
+    estado = np.random.choice(["FRIO", "EQUILIBRADO", "CALIENTE"]),  # FRIO, EQUILIBRADO, CALIENTE
+    precio_medio_zona = float(np.random.uniform(100000, 1000000)),
+    tendencia_anual_pct = float(np.random.uniform(-10, 10)),
+    descripcion = "Resumen del mercado inmobiliario"
+    )
+    
 
+    results = schemas.ValuationResponse(
+        id=str(uuid.uuid4()),
+        precio_estimado=float(precio_estimado.get("predictions")[0]) if isinstance(precio_estimado.get("predictions"), list) else float(precio_estimado.get("predictions")),
+        confianza=np.random.choice(["ALTA", "MEDIA", "BAJA"]),
+        margen_error_pct=float(np.random.uniform(0, 1)),
+        mercado=market_summary,
+        nota=None,
+        inmueble=input_data,
+        creado_en=pd.Timestamp.now().isoformat()
+    )
     return results
