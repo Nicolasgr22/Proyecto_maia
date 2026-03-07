@@ -1,6 +1,9 @@
+# Endpoint que devuelve un listado de PriceDataPoint
+from typing import List
 import json
-from typing import Any
+from typing import Any, Optional
 
+from avg_price_by_location import build_market_summary
 import numpy as np
 import pandas as pd
 from fastapi import APIRouter, HTTPException
@@ -12,6 +15,7 @@ from model.predict import make_prediction
 from app import __version__, schemas
 from app.config import settings
 import uuid
+from app.services.model_service import get_price_data_points
 
 api_router = APIRouter()
 
@@ -43,22 +47,32 @@ async def predict(input_data: schemas.PropertyInput) -> Any:
 
     logger.info(f"Prediction results: {precio_estimado.get('predictions')}")
 
-    market_summary = schemas.MarketSummary(
-    estado = np.random.choice(["FRIO", "EQUILIBRADO", "CALIENTE"]),  # FRIO, EQUILIBRADO, CALIENTE
-    precio_medio_zona = float(np.random.uniform(100000, 1000000)),
-    tendencia_anual_pct = float(np.random.uniform(-10, 10)),
-    descripcion = "Resumen del mercado inmobiliario"
-    )
+    confianza_pct = precio_estimado.get("confidence_pct") if precio_estimado.get("confidence_pct") else None
+    confianza_label = precio_estimado.get("confidence_label") if precio_estimado.get("confidence_label") else None
+    
+    logger.info(f"Confianza results: pct={confianza_pct}, label={confianza_label}")
+    market_summary = build_market_summary(lat = input_data.lat, lon = input_data.long, radius_ft=100000)
     
 
     results = schemas.ValuationResponse(
         id=str(uuid.uuid4()),
         precio_estimado=float(precio_estimado.get("predictions")[0]) if isinstance(precio_estimado.get("predictions"), list) else float(precio_estimado.get("predictions")),
-        confianza=np.random.choice(["ALTA", "MEDIA", "BAJA"]),
-        margen_error_pct=float(np.random.uniform(0, 1)),
+        confianza=confianza_label,
+        confianza_pct=confianza_pct,
         mercado=market_summary,
-        nota=None,
+        nota=f"Predicción generada usando modelo versión {model_version}",
         inmueble=input_data,
         creado_en=pd.Timestamp.now().isoformat()
     )
+    logger.info(f"Prediction results: {results}")
     return results
+
+
+@api_router.post("/prices", response_model=List[schemas.PriceDataPoint], status_code=200)
+async def get_prices(input_data: Optional[schemas.PriceFilter] = None) -> list:
+    """
+    Devuelve un listado de PriceDataPoint filtrado
+    """
+    print("Received input for price data points:", input_data)
+    prices = get_price_data_points(input_data) if input_data else get_price_data_points(schemas.PriceFilter())
+    return prices

@@ -1,6 +1,5 @@
 from typing import List, Optional
 from pydantic import BaseModel
-from .Ubicacion import Location
 
 class PropertyInput(BaseModel):
     bedrooms: Optional[int] = None  # Number of rooms
