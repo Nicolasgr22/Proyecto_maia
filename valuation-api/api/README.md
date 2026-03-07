@@ -75,6 +75,10 @@ Esto expondrá la API en `http://localhost:8001`.
 
 - Antes de publicar la imagen en ECR debe garantizar que tenga instalado awscli. 
 - Debe tener un Reposiorio ECR creado `maia-proyecto-final`
+- Debe tener un cluster ECS `maia-proyecto-final-ecs`
+- Debe tener un task definition `maia-proyecto-final-task`
+- Debe definir un contenedor `maia-proyecto-final-cnt`
+- Debe tener el servicio `maia-proyecto-final-service`
 
 #### Validación de awscli
 
@@ -100,7 +104,7 @@ Si no esta instalado siga las [instrucciones](https://docs.aws.amazon.com/es_es/
 - AWS Session Token 
 - Region (us-east-1)
 - format: solo dele enter
-3. Verifique que quedo vbien configurado ejecutando el comando `aws iam list - users`, la salida es una lista vacia de usuario
+3. Verifique que quedo vbien configurado ejecutando el comando `aws iam list-users`, la salida es una lista vacia de usuario
 
 
 #### Validacion existencia de ECR
@@ -126,5 +130,10 @@ aws ecr get-login-password --region us-east-1 | docker login --username AWS --pa
 2. publicar la imagen usando el siguiente comando
 ```bash
 docker push 526537081285.dkr.ecr.us-east-1.amazonaws.com/maia-proyecto-final
+```
+
+### Actualice el servicio 
+```bash
+aws ecs update-service --cluster maia-proyecto-final-ecs --service maia-proyecto-final-service --force-new-deployment
 ```
 98.89.40.169
