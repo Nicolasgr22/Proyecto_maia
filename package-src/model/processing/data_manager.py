@@ -1,3 +1,4 @@
+import json
 import typing as t
 from pathlib import Path
 
@@ -6,7 +7,7 @@ import pandas as pd
 from sklearn.pipeline import Pipeline
 
 from model import __version__ as _version
-from model.config.core import DATASET_DIR, TRAINED_MODEL_DIR, config
+from model.config.core import DATASET_DIR, TRAINED_MODEL_DIR,CONFIG_FILE_PATH, config
 
 
 def load_dataset(*, file_name: str) -> pd.DataFrame:
@@ -53,3 +54,16 @@ def remove_old_pipelines(*, files_to_keep: t.List[str]) -> None:
     for model_file in TRAINED_MODEL_DIR.iterdir():
         if model_file.name not in do_not_delete:
             model_file.unlink()
+
+# Función para leer config.json en la misma carpeta que config.yml
+def load_config_json():
+    json_path = CONFIG_FILE_PATH.parent / "config.json"
+    if not json_path.is_file():
+        raise FileNotFoundError(f"No se encontró config.json en {json_path}")
+    with open(json_path, "r") as f:
+        return json.load(f)
+
+# Devuelve el valor de r2 del config.json
+def get_attribute_from_config_json(attribute_name):
+    config = load_config_json()
+    return config.get(attribute_name)

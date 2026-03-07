@@ -8,6 +8,7 @@ include model/datasets/data_seattle.csv
 include model/trained/*.pkl
 include model/VERSION
 include model/config.yml
+include model/config/config.json
 
 include ./requirements/requirements.txt
 include ./requirements/test_requirements.txt

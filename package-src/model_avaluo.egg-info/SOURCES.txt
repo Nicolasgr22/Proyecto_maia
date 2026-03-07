@@ -3,11 +3,13 @@ pyproject.toml
 setup.py
 model/VERSION
 model/__init__.py
+model/config.json
 model/pipeline.py
 model/predict.py
 model/train.py
 model/train_pipeline.py
 model/config/__init__.py
+model/config/config.json
 model/config/config.yml
 model/config/core.py
 model/datasets/__init__.py
