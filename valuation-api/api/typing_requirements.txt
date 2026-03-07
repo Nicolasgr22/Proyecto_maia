@@ -1,0 +1,6 @@
+# repo maintenance tooling
+black
+flake8
+mypy
+isort
+pydantic

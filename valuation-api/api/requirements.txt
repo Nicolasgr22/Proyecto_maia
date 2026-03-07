@@ -1,0 +1,8 @@
+./model-pkg/model_avaluo-0.0.1-py3-none-any.whl
+uvicorn
+fastapi
+python-multipart
+typing_extensions
+loguru
+pydantic
+pydantic-settings
