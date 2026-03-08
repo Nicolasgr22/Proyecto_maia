@@ -4,28 +4,22 @@ from types import FrameType
 from typing import List, cast
 
 from loguru import logger
-from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings
 
 # Nivel del logger
 class LoggingSettings(BaseSettings):
     LOGGING_LEVEL: int = logging.INFO  # logging levels are type int
 
-# Configuración de raíz de la ruta, logger, CORS, nombre 
+# Configuración de raíz de la ruta, logger, CORS, nombre
 class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
 
     # Meta
     logging: LoggingSettings = LoggingSettings()
 
-    # BACKEND_CORS_ORIGINS is a comma-separated list of origins
-    # e.g: http://localhost,http://localhost:4200,http://localhost:3000
-    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
-        "http://localhost:3000",  # type: ignore
-        "http://localhost:8000",  # type: ignore
-        "https://localhost:3000",  # type: ignore
-        "https://localhost:8000",  # type: ignore
-    ]
+    # BACKEND_CORS_ORIGINS: List[str] — NO usar AnyHttpUrl porque Pydantic v2
+    # agrega trailing slash y el match de CORS falla.
+    BACKEND_CORS_ORIGINS: List[str] = ["*"]
 
     PROJECT_NAME: str = "Avaluo API"
 

@@ -22,7 +22,7 @@ pip install tox
 El modelo se instala como una dependencia desde el archivo `.whl` ubicado en `model-pkg/`. Se instala automáticamente al ejecutar tox, pero si deseas instalarlo manualmente:
 
 ```bash
-pip install model-pkg/model_avaluo-0.0.1-py3-none-any.whl
+pip install model-pkg/model_avaluo-0.1.0-py3-none-any.whl
 ```
 
 También puedes instalar todas las dependencias de la aplicación:
@@ -130,6 +130,14 @@ aws ecr get-login-password --region us-east-1 | docker login --username AWS --pa
 2. publicar la imagen usando el siguiente comando
 ```bash
 docker push 526537081285.dkr.ecr.us-east-1.amazonaws.com/maia-proyecto-final
+```
+tambien la puedes hacer buildeando de una vez ejecutando el siguiente comando
+
+```bash
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  -t 526537081285.dkr.ecr.us-east-1.amazonaws.com/maia-proyecto-final:latest \
+  --push .
 ```
 
 ### Actualice el servicio 

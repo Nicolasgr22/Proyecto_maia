@@ -1,4 +1,4 @@
-./model-pkg/model_avaluo-0.0.1-py3-none-any.whl
+./model-pkg/model_avaluo-0.1.0-py3-none-any.whl
 uvicorn
 fastapi
 python-multipart

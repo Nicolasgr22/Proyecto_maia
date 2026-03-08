@@ -3,8 +3,7 @@ from typing import List
 import json
 from typing import Any, Optional
 
-from avg_price_by_location import build_market_summary
-import numpy as np
+from app.services.avg_price_by_location import build_market_summary
 import pandas as pd
 from fastapi import APIRouter, HTTPException
 from fastapi.encoders import jsonable_encoder
@@ -39,8 +38,9 @@ async def predict(input_data: schemas.PropertyInput) -> Any:
     """
 
     input_df = pd.DataFrame([input_data.model_dump()])
+    input_df = input_df.apply(pd.to_numeric, errors='coerce')
     logger.info(f"Making prediction on inputs: {input_data.model_dump()}")
-    precio_estimado = make_prediction(input_data=input_df.replace({np.nan: None}))
+    precio_estimado = make_prediction(input_data=input_df)
     if precio_estimado["errors"] is not None:
         logger.warning(f"Prediction validation error: {precio_estimado.get('errors')}")
         raise HTTPException(status_code=400, detail=json.loads(precio_estimado["errors"]))

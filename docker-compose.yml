@@ -87,15 +87,42 @@ services:
       mlflow:
         condition: service_healthy
     environment:
-      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MLFLOW_TRACKING_URI: http://mlflow:5001
       AWS_ACCESS_KEY_ID: minio
       AWS_SECRET_ACCESS_KEY: minio123456
       MLFLOW_S3_ENDPOINT_URL: http://minio:9000
     volumes:
-      - ./Model:/app/Model
-      - ./Data:/app/Data
-    # Ajusta esto según tu script
+      - ./package-src/model:/app/Model
+      - ./package-src/model/datasets:/app/Data
     command: ["python", "Model/train.py"]
+
+  valuation-api:
+    build:
+      context: ./valuation-api
+      dockerfile: Dockerfile
+    container_name: maia-valuation-api
+    ports:
+      - "8001:8001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # VITE_API_BASE_URL es una variable de build-time.
+        # El navegador se conecta desde el host, por eso se usa localhost.
+        VITE_API_BASE_URL: http://localhost:8001
+    container_name: maia-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      valuation-api:
+        condition: service_healthy
 
 volumes:
   pgdata:
