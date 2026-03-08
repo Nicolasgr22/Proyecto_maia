@@ -1,0 +1,23 @@
+artifact_path: /Users/arinconr/Library/Mobile Documents/com~apple~CloudDocs/personal/maia/proyecto/Proyecto_maia/package-src/mlruns/1/models/m-57899147a4964637a9a30e8939be7453/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.10.19
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.7.2
+    skops_trusted_types: null
+mlflow_version: 3.10.1
+model_id: m-57899147a4964637a9a30e8939be7453
+model_size_bytes: 251204
+model_uuid: m-57899147a4964637a9a30e8939be7453
+prompts: null
+run_id: bb8bdffcf4854de98feec92da10f0efc
+utc_time_created: '2026-03-08 19:53:34.990631'

@@ -1,4 +1,5 @@
 MANIFEST.in
+README.md
 pyproject.toml
 setup.py
 model/VERSION
@@ -19,7 +20,7 @@ model/processing/__init__.py
 model/processing/data_manager.py
 model/processing/features.py
 model/processing/validation.py
-model/trained/modelo-avaluo-output0.0.1.pkl
+model/trained/modelo-avaluo-output0.1.0.pkl
 model_avaluo.egg-info/PKG-INFO
 model_avaluo.egg-info/SOURCES.txt
 model_avaluo.egg-info/dependency_links.txt

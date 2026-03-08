@@ -75,7 +75,7 @@ def make_prediction(
             else:
                 confidence_label = "Baja"   
         else:
-            confidence_label = "Desconocida"
+            confidence_label = ["Desconocida"] * len(preds_float)
         results = {
             "predictions": preds_float,
             "confidence_pct": confidence_pct,

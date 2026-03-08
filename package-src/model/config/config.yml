@@ -15,19 +15,19 @@ features:
   - sqft_living
   - sqft_lot
   - floors
-  - waterfront
-  - view
+  # - waterfront
+  # - view
   - condition
   - grade
   - sqft_above
-  - sqft_basement
-  - yr_built
-  - yr_renovated
-  - zipcode
-  - lat
-  - long
-  - sqft_living15
-  - sqft_lot15
+  # - sqft_basement
+  # - yr_built
+  # - yr_renovated
+  # - zipcode
+  # - lat
+  # - long
+  # - sqft_living15
+  # - sqft_lot15
 
 # pipelines
 pipeline_name: modelo-avaluo

@@ -5,27 +5,17 @@
         "sqft_living",
         "sqft_lot",
         "floors",
-        "waterfront",
-        "view",
         "condition",
         "grade",
-        "sqft_above",
-        "sqft_basement",
-        "yr_built",
-        "yr_renovated",
-        "zipcode",
-        "lat",
-        "long",
-        "sqft_living15",
-        "sqft_lot15"
+        "sqft_above"
     ],
     "best_params": {
         "xgb__learning_rate": 0.1,
         "xgb__max_depth": 5,
-        "xgb__n_estimators": 200
+        "xgb__n_estimators": 100
     },
-    "best_score": -15945465095.12394,
-    "rmse": 135796.12148269484,
-    "mae": 69342.02844825592,
-    "r2": 0.8767238486892757
+    "best_score": -47336963291.85955,
+    "rmse": 236362.49676723333,
+    "mae": 139990.78578078738,
+    "r2": 0.6265250542454202
 }
