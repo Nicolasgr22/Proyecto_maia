@@ -43,15 +43,18 @@ def main():
 
     # Modelo seleccionado
 
-    model_path = "../Model/xgb_model.pkl"
-    config_path = "../Model/config.json"
+    # model_path = "../Model/xgb_model.pkl"
+    # config_path = "../Model/config.json"
+
+    model_path = "package-src/model/xgb_model.pkl"
+    config_path = "package-src/model/config.json"
 
     model = joblib.load(model_path)
 
     with open(config_path) as json_file:
         data = json.load(json_file)
 
-    with mlflow.start_run(run_name='Selected_XGB_Model', experiment_id=experiment.experiment_id):
+    with mlflow.start_run(run_name='Selected_XGB_Model_v2', experiment_id=experiment.experiment_id):
 
         for param, value in data['best_params'].items():
             # Registre los parámetros
