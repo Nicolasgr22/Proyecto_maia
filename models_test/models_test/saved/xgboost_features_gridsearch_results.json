@@ -1,0 +1,30 @@
+{
+    "model": "XGBoost_wFeatures_GridSearch",
+    "params": {
+        "preprocess__features": [
+            "bedrooms",
+            "bathrooms",
+            "sqft_living",
+            "sqft_lot",
+            "floors",
+            "waterfront",
+            "view",
+            "condition",
+            "grade",
+            "sqft_above",
+            "sqft_basement",
+            "yr_built",
+            "yr_renovated",
+            "zipcode",
+            "lat",
+            "long"
+        ],
+        "xgb__learning_rate": 0.1,
+        "xgb__max_depth": 5,
+        "xgb__n_estimators": 200
+    },
+    "metrics": {
+        "RMSE": 19316133851.335598,
+        "R\u00b2": 0.8708707759796877
+    }
+}
