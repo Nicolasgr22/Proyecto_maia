@@ -28,3 +28,7 @@ python.exe
 *.pem
 
 dist/
+
+# Terraform — estado en S3, solo excluir directorio de plugins y backups locales
+terraform/.terraform/
+terraform/terraform.tfstate.backup
